@@ -1,5 +1,6 @@
 ﻿using DogWebApi.Data;
 using DogWebApi.Models;
+using DogWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,6 +11,21 @@ namespace DogWebApi.Controllers
     [ApiController]
     public class DogController : ControllerBase
     {
+        private readonly IEmailService _emailService;
+        
+        public DogController(IEmailService emailService)
+        {
+            _emailService = emailService;
+        }
+
+        //post mail
+        [HttpPost(Name = "EmailService")]
+        public IActionResult SendEmailMessage([FromForm] string email, [FromForm] string comment, [FromForm] string? tel)
+        {
+            _emailService.SendEmailAsync(email, "TEST", $"{comment} телефон: {tel}");
+            return Ok();
+        }
+        
         // GET: api/<DogController>
         [HttpGet]
         public IEnumerable<DogInfo> Get()
@@ -29,18 +45,6 @@ namespace DogWebApi.Controllers
         public Dog Get(Guid id)
         {
             return DataSeeds.list.FirstOrDefault(d => d.Id == id);
-        }
-
-        // POST api/<DogController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<DogController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
         }
 
         // DELETE api/<DogController>/5
